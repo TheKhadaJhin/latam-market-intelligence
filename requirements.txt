@@ -55,7 +55,7 @@ pydantic==2.13.4
     #   fastapi
     #   latam-market-intelligence
     #   pydantic-settings
-pydantic-core==2.46.4
+pydantic-core==2.48.0
     # via pydantic
 pydantic-settings==2.15.0
     # via latam-market-intelligence
