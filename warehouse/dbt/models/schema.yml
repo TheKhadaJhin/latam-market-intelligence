@@ -1,0 +1,56 @@
+version: 2
+
+models:
+  - name: stg_countries
+    description: Clean country dimension restricted to the configured LATAM markets.
+    columns:
+      - name: country_code
+        tests: [not_null, unique]
+      - name: country_name
+        tests: [not_null]
+
+  - name: stg_indicators
+    description: Indicator definitions and scoring metadata.
+    columns:
+      - name: indicator_code
+        tests: [not_null, unique]
+      - name: polarity
+        tests:
+          - accepted_values:
+              arguments:
+                values: [positive, negative]
+      - name: base_weight
+        tests: [not_null]
+
+  - name: stg_observations
+    description: Typed World Bank observations after structural validation.
+    tests:
+      - unique:
+          arguments:
+            column_name: "country_code || '-' || indicator_code || '-' || year"
+    columns:
+      - name: value
+        tests: [not_null]
+
+  - name: fct_market_observations
+    description: Business-ready observation fact table enriched with dimensions.
+    columns:
+      - name: country_code
+        tests: [not_null]
+      - name: indicator_code
+        tests: [not_null]
+
+  - name: mart_latest_indicator_values
+    description: Most recent available value for each country and indicator.
+    tests:
+      - unique:
+          arguments:
+            column_name: "country_code || '-' || indicator_code"
+
+  - name: mart_data_coverage
+    description: Data completeness and recency controls by country.
+    columns:
+      - name: country_code
+        tests: [not_null, unique]
+      - name: coverage_ratio
+        tests: [not_null]

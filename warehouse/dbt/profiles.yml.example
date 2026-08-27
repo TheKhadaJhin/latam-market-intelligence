@@ -1,0 +1,14 @@
+latam_market_intelligence:
+  target: dev
+  outputs:
+    dev:
+      type: postgres
+      host: "{{ env_var('DBT_POSTGRES_HOST', 'localhost') }}"
+      port: "{{ env_var('DBT_POSTGRES_PORT', '5432') | int }}"
+      user: "{{ env_var('DBT_POSTGRES_USER', 'market_intel') }}"
+      password: "{{ env_var('DBT_POSTGRES_PASSWORD', 'market_intel') }}"
+      dbname: "{{ env_var('DBT_POSTGRES_DB', 'market_intel') }}"
+      schema: analytics
+      threads: 4
+      connect_timeout: 10
+      retries: 2

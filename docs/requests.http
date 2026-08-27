@@ -1,0 +1,21 @@
+@baseUrl = http://localhost:8000
+
+GET {{baseUrl}}/health
+
+###
+GET {{baseUrl}}/ready
+
+###
+GET {{baseUrl}}/v1/rankings?scenario=base
+
+###
+GET {{baseUrl}}/v1/rankings?scenario=growth
+
+###
+GET {{baseUrl}}/v1/countries/CHL/history?indicator=IT.NET.USER.ZS&start_year=2018
+
+###
+GET {{baseUrl}}/v1/pipeline-runs
+
+###
+GET {{baseUrl}}/v1/methodology

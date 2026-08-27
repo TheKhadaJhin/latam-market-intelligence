@@ -1,0 +1,7 @@
+rank,country_code,country_name,reference_year,scenario,overall_score,coverage_ratio
+1,CHL,Chile,2025,base,65.36,1.0
+2,MEX,Mexico,2025,base,56.5,1.0
+3,ARG,Argentina,2025,base,51.53,1.0
+4,BRA,Brazil,2025,base,50.81,1.0
+5,PER,Peru,2025,base,50.46,1.0
+6,COL,Colombia,2025,base,24.81,1.0

@@ -1,0 +1,73 @@
+name: latam-market-intelligence
+
+services:
+  db:
+    image: postgres:17.6-alpine
+    environment:
+      POSTGRES_DB: market_intel
+      POSTGRES_USER: market_intel
+      POSTGRES_PASSWORD: market_intel
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U market_intel -d market_intel"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  api:
+    build: .
+    environment: &application-environment
+      MARKET_INTEL_ENVIRONMENT: production
+      MARKET_INTEL_DATABASE_URL: postgresql+psycopg://market_intel:market_intel@db:5432/market_intel
+      MARKET_INTEL_RAW_DATA_DIR: /app/data/raw
+      MARKET_INTEL_CORS_ORIGINS: http://localhost:8501
+    command: ["sh", "-c", "alembic upgrade head && uvicorn market_intel.main:app --host 0.0.0.0 --port 8000"]
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health', timeout=3)"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    read_only: true
+    tmpfs:
+      - /tmp
+    volumes:
+      - raw_data:/app/data/raw
+    restart: unless-stopped
+
+  pipeline:
+    build: .
+    environment: *application-environment
+    command: ["sh", "-c", "alembic upgrade head && market-intel pipeline --snapshot data/sample/world_bank_snapshot.json"]
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - raw_data:/app/data/raw
+    profiles: ["pipeline"]
+
+  dashboard:
+    build: .
+    environment:
+      MARKET_INTEL_API_URL: http://api:8000
+    command: ["streamlit", "run", "dashboard/app.py", "--server.address=0.0.0.0", "--server.port=8501"]
+    ports:
+      - "8501:8501"
+    depends_on:
+      api:
+        condition: service_healthy
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /home/app/.streamlit
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  raw_data:

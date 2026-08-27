@@ -1,0 +1,101 @@
+[build-system]
+requires = ["hatchling>=1.27"]
+build-backend = "hatchling.build"
+
+[project]
+name = "latam-market-intelligence"
+version = "1.0.0"
+description = "Reproducible LATAM market intelligence data product with explainable scoring."
+readme = "README.md"
+requires-python = ">=3.12"
+license = { file = "LICENSE" }
+authors = [{ name = "Mario Fuentes" }]
+keywords = ["data-engineering", "analytics-engineering", "fastapi", "latam", "dbt"]
+dependencies = [
+  "alembic>=1.16,<2",
+  "fastapi>=0.116,<1",
+  "httpx[socks]>=0.28,<1",
+  "prometheus-client>=0.22,<1",
+  "pydantic>=2.11,<3",
+  "pydantic-settings>=2.10,<3",
+  "sqlalchemy>=2.0.43,<3",
+  "structlog>=25.4,<26",
+  "tenacity>=9.1,<10",
+  "typer>=0.16,<1",
+  "uvicorn[standard]>=0.35,<1",
+]
+
+[project.optional-dependencies]
+dashboard = [
+  "pandas>=2.3,<3",
+  "plotly>=6.3,<7",
+  "streamlit>=1.48,<2",
+]
+orchestration = ["prefect>=3.4,<4"]
+postgres = ["psycopg[binary]>=3.2,<4"]
+warehouse = ["dbt-core>=1.10,<2", "dbt-postgres>=1.9,<2"]
+
+[dependency-groups]
+dev = [
+  "bandit[toml]>=1.8,<2",
+  "mypy>=1.17,<2",
+  "pip-audit>=2.9,<3",
+  "pytest>=9.0.3,<10",
+  "pytest-asyncio>=1.1,<2",
+  "pytest-cov>=6.2,<7",
+  "respx>=0.22,<1",
+  "ruff>=0.12,<1",
+]
+
+[project.scripts]
+market-intel = "market_intel.cli:app"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/market_intel"]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "N", "S", "SIM", "RUF", "ASYNC"]
+ignore = ["S101"]
+
+[tool.ruff.lint.per-file-ignores]
+"migrations/**/*.py" = ["E501", "N999"]
+"tests/**/*.py" = ["S105", "S106"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+plugins = ["pydantic.mypy"]
+packages = ["market_intel"]
+
+[tool.pytest.ini_options]
+addopts = "-ra --strict-config --strict-markers"
+testpaths = ["tests"]
+asyncio_mode = "auto"
+filterwarnings = ["ignore:Using .* with .* is deprecated"]
+
+[tool.coverage.run]
+branch = true
+source = ["market_intel"]
+omit = [
+  "src/market_intel/__main__.py",
+  "src/market_intel/orchestration/*",
+]
+
+[tool.coverage.report]
+fail_under = 90
+show_missing = true
+skip_covered = true
+exclude_also = [
+  "if TYPE_CHECKING:",
+  "if __name__ == .__main__.:",
+  "raise NotImplementedError",
+]
+
+[tool.bandit]
+exclude_dirs = ["tests", ".venv"]
+skips = ["B101"]

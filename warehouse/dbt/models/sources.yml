@@ -1,0 +1,38 @@
+version: 2
+
+sources:
+  - name: application
+    description: Tables loaded and managed by the Python ingestion service.
+    schema: public
+    tables:
+      - name: countries
+        columns:
+          - name: code
+            tests: [not_null, unique]
+      - name: indicators
+        columns:
+          - name: code
+            tests: [not_null, unique]
+      - name: observations
+        loaded_at_field: fetched_at
+        freshness:
+          warn_after: {count: 400, period: day}
+        columns:
+          - name: country_code
+            tests:
+              - not_null
+              - relationships:
+                  arguments:
+                    to: source('application', 'countries')
+                    field: code
+          - name: indicator_code
+            tests:
+              - not_null
+              - relationships:
+                  arguments:
+                    to: source('application', 'indicators')
+                    field: code
+          - name: year
+            tests: [not_null]
+          - name: value
+            tests: [not_null]

@@ -1,0 +1,20 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - run: git archive --format=zip --output=latam-market-intelligence-${GITHUB_REF_NAME}.zip HEAD
+      - uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          files: latam-market-intelligence-${{ github.ref_name }}.zip
