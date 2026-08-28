@@ -18,6 +18,13 @@ explainable scoring, observability, and clear communication.
 > This is a portfolio decision-support model—not investment, legal, economic, or expansion
 > advice. Scores are relative to the configured countries, indicators, year, and scenario.
 
+## Executive dashboard
+
+![LATAM Market Intelligence dashboard showing the balanced ranking for six markets](docs/images/latam-dashboard.jpg)
+
+The preview uses the committed World Bank snapshot and the reproducible base-scenario
+scores documented below.
+
 ## Business question
 
 **Which configured LATAM markets show the strongest relative conditions for expansion, and
