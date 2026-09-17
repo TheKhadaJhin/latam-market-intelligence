@@ -18,12 +18,12 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - uses: astral-sh/setup-uv@v7
         with:
           version: "0.11.33"
           enable-cache: true
-      - uses: actions/setup-python@v6
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
       - run: uv sync --frozen --group dev
@@ -31,7 +31,7 @@ jobs:
       - run: uv run ruff check .
       - run: uv run mypy src
       - run: uv run pytest --cov=market_intel --cov-report=term-missing --cov-report=xml
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: coverage-xml
           path: coverage.xml
@@ -62,12 +62,12 @@ jobs:
       DBT_POSTGRES_PASSWORD: market_intel
       DBT_POSTGRES_DB: market_intel
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - uses: astral-sh/setup-uv@v7
         with:
           version: "0.11.33"
           enable-cache: true
-      - uses: actions/setup-python@v6
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
       - run: uv sync --frozen --extra postgres --extra warehouse
@@ -81,7 +81,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - uses: docker/setup-buildx-action@v3
       - uses: docker/build-push-action@v6
         with:
