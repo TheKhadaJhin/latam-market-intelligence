@@ -47,22 +47,48 @@ It exposes three deliberately different views:
 
 ## Reproducible result at a glance
 
-Using the committed World Bank snapshot, the balanced scenario produces the following result.
+The same committed World Bank snapshot produces all three scenario rankings below.
 The source reports its latest dataset update as **2026-07-13**; the scoring reference year is
-**2025** and all six markets have **100% weighted coverage**.
+**2025** and all six markets have **100% weighted coverage** in each scenario.
+Rank columns show positions, where **1 is the highest-ranked market**; the score column
+belongs to `base` only.
 
-| Rank | Market | Balanced score |
-| ---: | --- | ---: |
-| 1 | Chile | 65.36 |
-| 2 | Mexico | 56.50 |
-| 3 | Argentina | 51.53 |
-| 4 | Brazil | 50.81 |
-| 5 | Peru | 50.46 |
-| 6 | Colombia | 24.81 |
+| Market | `base` rank | Balanced score | `growth` rank | `resilience` rank |
+| --- | ---: | ---: | ---: | ---: |
+| Chile | 1 | 65.36 | 1 | 2 |
+| Mexico | 2 | 56.50 | 4 | 1 |
+| Argentina | 3 | 51.53 | 2 | 5 |
+| Brazil | 4 | 50.81 | 5 | 3 |
+| Peru | 5 | 50.46 | 3 | 4 |
+| Colombia | 6 | 24.81 | 6 | 6 |
 
-The order changes by decision lens: Mexico leads the resilience scenario, while Chile leads
-the balanced and growth scenarios. That sensitivity is intentional and visible rather than
-hidden behind a single universal ranking.
+Chile leads `base` and `growth`, Mexico leads `resilience`, and Argentina moves from
+second in `growth` to fifth in `resilience`.
+With the data and reference year held constant, these changes show sensitivity to the
+[configured scenario weights](src/market_intel/catalog.py): they are analyst assumptions,
+not learned parameters or a forecast of which country will perform best.
+
+### Reproduce the scenario comparison
+
+Use a fresh checkout without an existing SQLite database or `.env` overrides, so previous
+live observations cannot enter this snapshot-only comparison. From the repository root:
+
+```bash
+uv sync --frozen --no-dev
+uv run --frozen --no-dev market-intel pipeline --snapshot data/sample/world_bank_snapshot.json --start-year 2015 --end-year 2026
+uv run --frozen --no-dev market-intel export-rankings --scenario base --year 2025 --destination data/exports/rankings_base.csv
+uv run --frozen --no-dev market-intel export-rankings --scenario growth --year 2025 --destination data/exports/rankings_growth.csv
+uv run --frozen --no-dev market-intel export-rankings --scenario resilience --year 2025 --destination data/exports/rankings_resilience.csv
+```
+
+The pipeline reports **518 observations**, **18 rankings** and reference year **2025**.
+Each CSV contains six markets, including their position, score and coverage. The `base`
+export matches the committed [expected ranking](data/sample/expected_rankings_base.csv);
+the other two exports reproduce the additional columns above.
+
+These commands use the existing [pipeline](src/market_intel/services/pipeline.py) and
+[CSV exporter](src/market_intel/cli.py). They do not fetch live World Bank data or change
+the scoring rules. Generated exports stay in the ignored `data/exports/` directory.
 
 ## Architecture
 
